@@ -20,4 +20,12 @@ app.use(express.urlencoded({extended:true,limit:"20kb"}))
 //for serving static files like css, etc
 app.use(express.static("public"))
 
+
+//routes importing
+import userRouter from './routes/user.routes.js'
+
+//routes usage
+app.use("/api/v1/users",userRouter)
+
+
 export {app}
