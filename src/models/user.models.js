@@ -50,7 +50,7 @@ const userSchema=new mongoose.Schema({
 // mongoose hooks 
 userSchema.pre("save", async function(next){
    if(this.isModified("password")) // isModified is a function already given in mongoose to check if the fireld is chamged or not  
-   this.password=bcrypt.hash(this.password,10);
+   this.password=await bcrypt.hash(this.password,10);
    next();
 })
 
