@@ -15,7 +15,7 @@ app.use(express.json({
 }))
 
 //for url data
-app.use(express.urlencoded({extended:true,limit:"20kb"}))
+app.use(express.urlencoded({extended:true}))
 
 //for serving static files like css, etc
 app.use(express.static("public"))

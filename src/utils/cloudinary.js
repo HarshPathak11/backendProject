@@ -12,12 +12,13 @@ cloudinary.config({
 const uploadLocalFile= async (localfilepath)=>{
     try {
         if(!localfilepath) return null;
-       const response= cloudinary.uploader.upload(localfilepath,{
+       const respons= cloudinary.uploader.upload(localfilepath,{
             resource_type:"auto"
         })
         console.log("file is successfully uploaded");
-        console.log(response.url)
-        return response;
+        console.log(respons.url)
+        // fs.unlinkSync(localfilepath)
+        return respons;
     } catch (error) {
         // since you are not able to upload the file it is recommended to delete them from the server
         fs.unlinkSync(localfilepath)

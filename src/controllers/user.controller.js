@@ -2,6 +2,7 @@ import { asyncHandler } from "../utils/asyncHandler.js"
 import { ApiError } from "../utils/ApiError.js"
 import {User} from "../models/user.models.js"
 import {uploadLocalFile} from '../utils/cloudinary.js'
+import {ApiResponse} from '../utils/ApiResponse.js'
 const userRegister=asyncHandler(async (req,res)=>{
    // get user details from frontend
    // validation- not empty
@@ -35,43 +36,44 @@ const userRegister=asyncHandler(async (req,res)=>{
    }
    
 
-   const existedUser=User.findOne({
+   const existedUser= await User.findOne({
       $or:[{email},{username}]
    })
 
    if(existedUser)
    throw new ApiError(409,"User Already exists")
-   
+   console.log(req.files)
    const avatarPath=req.files?.avatar[0]?.path //usinng multer to get the original path of the file - ise rtt lo
-   const coverPath=req.files?.coverImage[0]?.path
+   // const coverPath=req.files?.coverImage[0]?.path
    if(!avatarPath)
    throw new ApiError(400,"avatar missing")
-   if(!coverPath)
-   throw new ApiError(400,"cover image required");
+   // if(!coverPath)
+   // throw new ApiError(400,"cover image required");
   
     
    const avatar=await uploadLocalFile(avatarPath)
-   const coverImage= await uploadLocalFile(coverPath)
+   // const coverImage= await uploadLocalFile(coverPath)
    if(!avatar)
    throw new ApiError(400,"avatar missing") 
 
 
    //creating the user
-  const user= User.create({
+  const user= await User.create({
       fullname,
       avatar:avatar.url,
-      coverImage:coverImage?.url||"",
+      // coverImage:coverImage?.url||"",
       email,
       password,
       username
    })
    //checking if user is formed
-   const createdUser=User.findById(user._id).select(
+   const createdUser= await User.findById(user._id).select(
       "--password --refreshToken"
    )
    if(!createdUser)
    throw new ApiError(500,"something went wrong while registering hte user")
-
+   
+   console.log(createdUser)
    return res.status(201).json(
       new ApiResponse(200,"User Registerd Successfully")
    )
