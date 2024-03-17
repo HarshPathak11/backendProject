@@ -20,6 +20,8 @@ app.use(express.urlencoded({extended:true}))
 //for serving static files like css, etc
 app.use(express.static("public"))
 
+app.use(cookieParser())
+
 
 //routes importing
 import userRouter from './routes/user.routes.js'

@@ -4,9 +4,10 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import jwt from "jsonwebtoken";
 
 
-export const verifyJWT= asyncHandler(async (req,res)=>{
+export const verifyJWT= asyncHandler(async (req,res,next)=>{
    try {
-    const token= req.cookies?.accessToken || req.header("Authorization")?.replace("Bearer ","");
+   //   console.log(req.cookies.accessToken) 
+    const token= req.cookies.accessToken || req.header("Authorization")?.replace("Bearer ","");
     if(!token){
      throw new ApiError(401,"Token not received")
     }
@@ -21,6 +22,6 @@ export const verifyJWT= asyncHandler(async (req,res)=>{
     req.user=user
     next();
    } catch (error) {
-    throw new ApiError(500,"Sorry")
+    throw new ApiError(500,error)
    }
 })

@@ -84,10 +84,11 @@ const userRegister=asyncHandler(async (req,res)=>{
 const generateAccessandRefreshToken=async (userID)=>{
    try {
       const user=await User.findById(userID)
+      console.log(user)
       const accessToken=user.generateAccessToken();
       const refreshToken=user.generateRefreshToken();
       user.refreshToken=refreshToken
-
+     
       //saving the changes made in the user from DB
       await user.save({validateBeforeSave:false})
 
@@ -161,8 +162,8 @@ const logoutUser=asyncHandler(async (req,res)=>{
     }
    
     return res.status(200)
-    .clearCookie("accessToken",accessToken,options)
-    .clearCookie("refreshToken",refreshToken,options)
+    .clearCookie("accessToken",req.user.accessToken,options)
+    .clearCookie("refreshToken",req.user.refreshToken,options)
     .json(
       new ApiResponse(200,{},
       "User Logged In Succefully")
