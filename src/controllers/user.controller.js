@@ -210,4 +210,110 @@ const refreshAccessToken= asyncHandler(async (req,res)=>{
       )
    )
 })
-export {userRegister,userLogin,logoutUser,refreshAccessToken}
+
+const changeCurrentPassword=asyncHandler( async (req,res)=>{
+   const {oldPassword,newPassword}=req.body;
+   const user=User.findById(req.user?._id)
+   if(!user)
+   throw new ApiError(500,"something went wrong")
+
+   const isPasswordCorrect=await user.isPasswordCorrect(oldPassword)
+   if(!isPasswordCorrect)
+   throw new ApiError(400,"Invalid Password")
+
+   user.password=newPassword
+   await user.save({validateBeforeSave:false})
+
+   res.status(200)
+   .json( new ApiResponse(200,"Password Changed Successfully"))
+
+})
+
+const getCurrentUser=asyncHandler(async (req,res)=>{
+   return res.status(200)
+   .json(new ApiResponse(200,req.user,"current user fetched"))
+})
+
+
+const updateAccountDetails=asyncHandler(async (req,res)=>{
+   const {fullname,email}=req.body
+   if(!fullname && !email)
+   throw new ApiError(400,"Atleast one field is required")
+
+   const user= await User.findByIdAndUpdate(
+      req.user?._id,
+      {
+        $set:{ fullname:fullname,
+         email:email
+        }
+      }
+      ,{
+         new:true
+      }
+   ).select("-password")
+
+   return res.status(200).json(new ApiResponse(200,user,"Account details updated"))
+})
+
+
+const updateUserAvatar=asyncHandler(async (req,res)=>{
+   const avatarLocalPath=req.file?.path
+
+   if(!avatarLocalPath)
+   throw new ApiError(400,"Avatar file is missing")
+
+   const newavatar=await uploadLocalFile(avatarLocalPath)
+
+   if(!avatar)
+   throw new ApiError(400,"ERROR IN UPLOADING FILE");
+
+
+   //aise bhi krr skte
+   // const user=await User.findById(req.user._id)
+   // if(!user)
+   // throw new ApiError(500,"Something went wrong")
+
+   // user.avatar=newavatar
+
+   // await user.save({validateBeforeSave:false})
+
+   const user=await User.findByIdAndUpdate(
+      req.user._id,
+      {
+         $set:{
+            avatar:newavatar.url
+         }
+      },
+      {new:true}
+   ).select("-password")
+   if(!user)
+   throw new ApiError(500,"Could not upload file")
+
+   return res.status(200)
+   .json(new ApiResponse(200,user,"updated avatar image"))
+   
+})
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+export {userRegister,userLogin,logoutUser,refreshAccessToken,changeCurrentPassword,getCurrentUser,updateAccountDetails,updateUserAvatar}
